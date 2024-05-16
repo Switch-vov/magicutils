@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 
 /**
@@ -43,31 +45,46 @@ public interface HttpUtils {
         return getDefault().post(requestString, url);
     }
 
-
     static <T> T httpGet(String url, Class<T> clazz) {
+        return httpGet(HttpUtils::get, url, clazz);
+    }
+
+    static <T> T httpGet(Function<String, String> f, String url, Class<T> clazz) {
         log.debug(" =====> httpGet:{}", url);
-        String respJson = get(url);
+        String respJson = f.apply(url);
         log.debug(" =====> response:{}", respJson);
         return JsonUtils.fromJson(respJson, clazz);
     }
 
     static <T> T httpGet(String url, TypeReference<T> typeReference) {
+        return httpGet(HttpUtils::get, url, typeReference);
+    }
+
+    static <T> T httpGet(Function<String, String> f, String url, TypeReference<T> typeReference) {
         log.debug(" =====> httpGet:{}", url);
-        String respJson = get(url);
+        String respJson = f.apply(url);
         log.debug(" =====> response:{}", respJson);
         return JsonUtils.fromJson(respJson, typeReference);
     }
 
     static <T> T httpPost(String requestString, String url, Class<T> clazz) {
+        return httpPost(HttpUtils::post, requestString, url, clazz);
+    }
+
+    static <T> T httpPost(BiFunction<String, String, String> f, String requestString, String url, Class<T> clazz) {
         log.debug(" =====> httpPost:{}", url);
-        String respJson = post(requestString, url);
+        String respJson = f.apply(requestString, url);
         log.debug(" =====> response:{}", respJson);
         return JsonUtils.fromJson(respJson, clazz);
     }
 
     static <T> T httpPost(String requestString, String url, TypeReference<T> typeReference) {
+        return httpPost(HttpUtils::post, requestString, url, typeReference);
+    }
+
+    static <T> T httpPost(BiFunction<String, String, String> f, String requestString, String url, TypeReference<T> typeReference) {
         log.debug(" =====> httpPost:{}", url);
-        String respJson = post(requestString, url);
+        String respJson = f.apply(requestString, url);
         log.debug(" =====> response:{}", respJson);
         return JsonUtils.fromJson(respJson, typeReference);
     }
